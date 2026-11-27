@@ -25,7 +25,7 @@ const CARD =
 export function AlertsPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [symbol, setSymbol] = useState("NVDA");
+  const [symbol, setSymbol] = useState("NVDU");
   const [type, setType] = useState("PRICE_TARGET");
   const [target, setTarget] = useState("175");
 

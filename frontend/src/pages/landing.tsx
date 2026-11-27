@@ -7,16 +7,16 @@ import { ChangePill, LiveBadge, Sparkline } from "@/components/market";
 import { cn } from "@/lib/utils";
 
 const SIGNALS = [
-  { symbol: "NVDA", name: "NVIDIA Corp", price: 178.42, changePct: 4.82, spark: [4, 5, 6, 7, 8, 9, 10, 12] },
-  { symbol: "TSLA", name: "Tesla Inc", price: 248.91, changePct: 3.91, spark: [3, 4, 4, 6, 7, 8, 9, 11] },
-  { symbol: "AMD", name: "Advanced Micro", price: 162.18, changePct: 3.44, spark: [5, 4, 6, 7, 6, 8, 9, 10] },
-  { symbol: "PLTR", name: "Palantir Tech", price: 41.27, changePct: 2.98, spark: [3, 4, 5, 5, 6, 7, 8, 9] },
-  { symbol: "AAPL", name: "Apple Inc", price: 228.16, changePct: 1.62, spark: [6, 6, 7, 7, 8, 8, 9, 9] },
-  { symbol: "MSFT", name: "Microsoft Corp", price: 429.05, changePct: 0.84, spark: [5, 6, 6, 7, 7, 8, 8, 9] },
-  { symbol: "META", name: "Meta Platforms", price: 512.04, changePct: -0.92, spark: [9, 8, 8, 7, 6, 6, 5, 4] },
-  { symbol: "COIN", name: "Coinbase Global", price: 198.55, changePct: -2.16, spark: [10, 9, 8, 7, 6, 5, 4, 3] },
-  { symbol: "INTC", name: "Intel Corp", price: 22.41, changePct: -1.08, spark: [7, 6, 6, 5, 5, 4, 4, 3] },
-  { symbol: "AMZN", name: "Amazon.com Inc", price: 186.32, changePct: 0.41, spark: [5, 5, 6, 6, 6, 7, 7, 7] },
+  { symbol: "NVDU", name: "NoVidia Corp", price: 178.42, changePct: 4.82, spark: [4, 5, 6, 7, 8, 9, 10, 12] },
+  { symbol: "TSLO", name: "Teslo Motors", price: 248.91, changePct: 3.91, spark: [3, 4, 4, 6, 7, 8, 9, 11] },
+  { symbol: "ADMD", name: "Admittedly Micro", price: 162.18, changePct: 3.44, spark: [5, 4, 6, 7, 6, 8, 9, 10] },
+  { symbol: "PLTE", name: "Palantear Tech", price: 41.27, changePct: 2.98, spark: [3, 4, 5, 5, 6, 7, 8, 9] },
+  { symbol: "PEAR", name: "Pear Computing", price: 228.16, changePct: 1.62, spark: [6, 6, 7, 7, 8, 8, 9, 9] },
+  { symbol: "MHRD", name: "Macrohard Corp", price: 429.05, changePct: 0.84, spark: [5, 6, 6, 7, 7, 8, 8, 9] },
+  { symbol: "MEHT", name: "Mehta Platforms", price: 512.04, changePct: -0.92, spark: [9, 8, 8, 7, 6, 6, 5, 4] },
+  { symbol: "CNBS", name: "Coinbass Global", price: 198.55, changePct: -2.16, spark: [10, 9, 8, 7, 6, 5, 4, 3] },
+  { symbol: "INTL", name: "Intellish Corp", price: 22.41, changePct: -1.08, spark: [7, 6, 6, 5, 5, 4, 4, 3] },
+  { symbol: "AMZY", name: "Amazin.com Inc", price: 186.32, changePct: 0.41, spark: [5, 5, 6, 6, 6, 7, 7, 7] },
 ];
 
 const LOOPED_SIGNALS = [...SIGNALS, ...SIGNALS];

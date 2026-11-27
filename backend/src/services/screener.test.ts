@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { applyScreen, matchesFilter, scoreMatch } from "./screener";
 import type { Quote, ScreenerFilter } from "../types";
 
-const ford: Quote = {
-  symbol: "F",
-  name: "Ford",
+const fjord: Quote = {
+  symbol: "FJRD",
+  name: "Fjord Motor Co.",
   price: 11.42,
   changePct: -1.24,
   volume: 52_300_000,
@@ -12,9 +12,9 @@ const ford: Quote = {
   pe: 12.1,
 };
 
-const nvda: Quote = {
-  symbol: "NVDA",
-  name: "NVIDIA",
+const novidia: Quote = {
+  symbol: "NVDU",
+  name: "NoVidia Corp.",
   price: 178.42,
   changePct: 4.82,
   volume: 312_400_000,
@@ -30,16 +30,16 @@ const filters: ScreenerFilter[] = [
 
 describe("screener engine", () => {
   it("accepts value names that clear every rule", () => {
-    expect(matchesFilter(ford, filters[1])).toBe(true);
-    expect(applyScreen([ford, nvda], filters).map((q) => q.symbol)).toEqual(["F"]);
+    expect(matchesFilter(fjord, filters[1])).toBe(true);
+    expect(applyScreen([fjord, novidia], filters).map((q) => q.symbol)).toEqual(["FJRD"]);
   });
 
   it("rejects expensive growth names on P/E", () => {
-    expect(matchesFilter(nvda, filters[1])).toBe(false);
+    expect(matchesFilter(novidia, filters[1])).toBe(false);
   });
 
   it("scores partial matches between 0 and 1", () => {
-    expect(scoreMatch(nvda, filters)).toBeCloseTo(2 / 3);
-    expect(scoreMatch(ford, filters)).toBe(1);
+    expect(scoreMatch(novidia, filters)).toBeCloseTo(2 / 3);
+    expect(scoreMatch(fjord, filters)).toBe(1);
   });
 });

@@ -33,7 +33,7 @@ describe("landing page", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: /Build a screener that tracks smart money/i }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("NVDA").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("NVDU").length).toBeGreaterThan(0);
     expect(screen.getByText("Get Started")).toBeInTheDocument();
   });
 });
