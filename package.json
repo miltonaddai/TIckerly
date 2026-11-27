@@ -1,0 +1,25 @@
+{
+  "name": "tickerly",
+  "version": "0.1.0",
+  "license": "MIT",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web,worker -c blue,magenta,yellow \"yarn workspace @tickerly/api dev\" \"yarn workspace @tickerly/web dev\" \"yarn workspace @tickerly/api worker\"",
+    "dev:api": "yarn workspace @tickerly/api dev",
+    "dev:web": "yarn workspace @tickerly/web dev",
+    "worker": "yarn workspace @tickerly/api worker",
+    "build": "yarn workspace @tickerly/api build && yarn workspace @tickerly/web build",
+    "start": "concurrently -k -n api,web -c blue,magenta \"yarn workspace @tickerly/api start\" \"yarn workspace @tickerly/web preview --port 5173\"",
+    "test": "yarn workspace @tickerly/api test && yarn workspace @tickerly/web test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "private": true
+}
