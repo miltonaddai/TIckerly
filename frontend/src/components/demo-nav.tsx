@@ -23,7 +23,6 @@ const PAGES = [
       { to: "/onboarding/name", label: "First name" },
       { to: "/onboarding/asset", label: "Asset class" },
       { to: "/onboarding/experience", label: "Experience" },
-      { to: "/subscribe", label: "Subscribe" },
     ],
   },
   {

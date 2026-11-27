@@ -32,20 +32,6 @@ export const authApi = {
     }),
 };
 
-export const billingApi = {
-  checkout: (plan: "pro" | "max") =>
-    api<{ url: string }>("/billing/checkout", {
-      method: "POST",
-      body: JSON.stringify({ plan }),
-    }),
-  portal: () => api<{ url: string }>("/billing/portal", { method: "POST" }),
-  confirm: (sessionId: string, plan?: "pro" | "max") =>
-    api<Profile>("/billing/confirm", {
-      method: "POST",
-      body: JSON.stringify({ sessionId, plan }),
-    }),
-};
-
 export const profileApi = {
   update: (patch: Partial<Profile>) =>
     api<Profile>("/profile", { method: "PATCH", body: JSON.stringify(patch) }),

@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_SCREEN_FILTERS } from "@/lib/screener";
-import { hasActiveSubscription } from "@/lib/subscription";
-import type { Profile } from "@/lib/types";
 import { useChatStore } from "@/stores/chat";
 import { useScreenerStore } from "@/stores/screener";
 
@@ -60,15 +58,5 @@ describe("screener store", () => {
   it("switches view", () => {
     useScreenerStore.getState().setView("technicals");
     expect(useScreenerStore.getState().view).toBe("technicals");
-  });
-});
-
-describe("hasActiveSubscription", () => {
-  it("accepts active and trialing only", () => {
-    const status = (subscriptionStatus: Profile["subscriptionStatus"]) => ({ subscriptionStatus }) as Profile;
-    expect(hasActiveSubscription(status("active"))).toBe(true);
-    expect(hasActiveSubscription(status("trialing"))).toBe(true);
-    expect(hasActiveSubscription(status("canceled"))).toBe(false);
-    expect(hasActiveSubscription(null)).toBe(false);
   });
 });

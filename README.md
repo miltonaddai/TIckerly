@@ -30,7 +30,7 @@ The app has no external services and no API keys:
 | Accounts, profile, watchlist, alerts | In-memory store (reset on API restart) |
 | Market data | Generated quotes for 114 fictional companies and index funds that drift every 5 minutes. **Not real prices or real companies.** |
 | AI assistant | Rule-based summary of the current quotes |
-| Plans | Choosing a plan updates the profile; nothing is gated |
+| Limits | 50 watchlist symbols and 50 alert rules per user. No plans or payments |
 | Rate limits / alert worker | In-process |
 | Fonts | Bundled via `@fontsource` |
 

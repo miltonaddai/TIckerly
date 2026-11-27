@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/use-auth";
 import { formatAssetClasses } from "@/lib/assets";
 import { readProfilePhoto } from "@/lib/avatar";
-import { billingApi, profileApi } from "@/lib/queries";
+import { profileApi } from "@/lib/queries";
 import type { NotificationPrefs } from "@/lib/types";
 
 const DEFAULT_PREFS: NotificationPrefs = {
@@ -27,7 +27,7 @@ export function ProfilePage() {
   const { profile, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [busy, setBusy] = useState<"portal" | "logout" | null>(null);
+  const [busy, setBusy] = useState<"logout" | null>(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile?.firstName ?? "");
   const [photo, setPhoto] = useState(profile?.avatarUrl ?? "");
@@ -103,46 +103,15 @@ export function ProfilePage() {
             <Avatar className="size-20">
               {profile?.avatarUrl ? <AvatarImage src={profile.avatarUrl} /> : null}
               <AvatarFallback className="text-xl">
-                {(profile?.firstName?.[0] ?? "M").toUpperCase()}
+                {(profile?.firstName?.[0] ?? "D").toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="mt-4 text-lg font-medium">{profile?.firstName || "Demo User"}</div>
             <div className="text-sm text-white/45">{profile?.email || "demo@tickerly.app"}</div>
-            <span className="mt-3 rounded-full border border-white/15 px-3 py-1 text-[10px] tracking-[0.14em] text-white/70">
-              {(profile?.plan ?? "max").toUpperCase()} PLAN
-            </span>
             <Button className="mt-6 w-full rounded-xl" variant="default" onClick={openEditor}>
               Edit profile
             </Button>
           </GlassPanel>
-
-          <div>
-            <p className="mb-2 text-[10px] uppercase tracking-[0.18em] text-white/35">Subscription</p>
-            <GlassPanel className="p-6">
-              <div className="font-serif text-3xl capitalize">{profile?.plan ?? "Max"}</div>
-              <div className="mt-1 text-white/70">{profile?.plan === "pro" ? "$19" : "$49"} / month</div>
-              <p className="mt-3 text-xs text-white/40">
-                Renews {profile?.renewsAt ?? "Sep 20, 2026"} · Visa ending {profile?.cardLast4 ?? "4417"}
-              </p>
-              <Button
-                variant="outline"
-                className="mt-5 rounded-xl"
-                size="sm"
-                disabled={busy !== null}
-                onClick={async () => {
-                  setBusy("portal");
-                  try {
-                    const { url } = await billingApi.portal();
-                    window.location.assign(url);
-                  } catch {
-                    setBusy(null);
-                  }
-                }}
-              >
-                Manage plan
-              </Button>
-            </GlassPanel>
-          </div>
 
           <Button
             variant="destructive"

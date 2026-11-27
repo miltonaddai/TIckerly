@@ -127,12 +127,14 @@ export function OnboardingExperiencePage() {
   function onContinue() {
     const draft = useOnboardingStore.getState().draft(profile);
     setExperience(draft.experience);
-    navigate({ to: "/subscribe" });
     void updateProfile({
       firstName: draft.firstName,
       assetClass: draft.assetClass,
       experience: draft.experience,
+      onboardingComplete: true,
     });
+    useOnboardingStore.getState().reset();
+    navigate({ to: "/home" });
   }
 
   return (
@@ -155,5 +157,4 @@ export function OnboardingExperiencePage() {
   );
 }
 
-export { SubscribePage as OnboardingPlanPage } from "@/pages/subscribe";
 

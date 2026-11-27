@@ -1,14 +1,3 @@
-export type PlanId = "pro" | "max";
-export type SubscriptionStatus =
-  | "inactive"
-  | "incomplete"
-  | "incomplete_expired"
-  | "trialing"
-  | "active"
-  | "past_due"
-  | "canceled"
-  | "unpaid"
-  | "paused";
 export type AssetClass = "stocks" | "crypto" | "futures" | "options";
 export type ExperienceLevel = "just_starting" | "1_3_years" | "3_7_years" | "7_plus";
 
@@ -17,17 +6,13 @@ export type Profile = {
   email: string;
   firstName: string;
   avatarUrl: string | null;
-  plan: PlanId;
   assetClass: AssetClass[];
   experience: ExperienceLevel;
   currency: string;
   timezone: string;
   twoFactorEnabled: boolean;
   linkedBrokers: number;
-  renewsAt: string;
-  cardLast4: string;
   onboardingComplete: boolean;
-  subscriptionStatus: SubscriptionStatus;
 };
 
 export type Quote = {

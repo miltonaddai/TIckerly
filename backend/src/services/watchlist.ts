@@ -38,7 +38,7 @@ export async function addWatchlistSymbol(session: Session, raw: string, cap: num
   const current = await listSymbols(session);
   if (current.includes(symbol)) return quotesFor(current);
   if (current.length >= cap) {
-    throw new AuthError("Watchlist limit reached for your plan.", 403);
+    throw new AuthError("Watchlist limit reached.", 403);
   }
 
   memory.set(session.sub, [...current, symbol]);

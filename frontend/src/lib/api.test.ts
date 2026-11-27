@@ -32,10 +32,10 @@ describe("api client", () => {
   });
 
   it("throws ApiError with the server message and status", async () => {
-    mockFetch(403, { error: "Watchlist limit reached for your plan." });
+    mockFetch(403, { error: "Watchlist limit reached." });
     const error = await api("/market/watchlist").catch((err: unknown) => err);
     expect(error).toBeInstanceOf(ApiError);
-    expect(error).toMatchObject({ message: "Watchlist limit reached for your plan.", status: 403 });
+    expect(error).toMatchObject({ message: "Watchlist limit reached.", status: 403 });
   });
 
   it("falls back to a generic message when the body is not JSON", async () => {

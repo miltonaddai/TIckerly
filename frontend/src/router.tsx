@@ -3,7 +3,6 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  redirect,
   useRouterState,
 } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -29,8 +28,6 @@ import { HomePage } from "@/pages/home";
 import { ScreenerPage } from "@/pages/screener";
 import { AlertsPage } from "@/pages/alerts";
 import { ProfilePage } from "@/pages/profile";
-import { SubscribePage } from "@/pages/subscribe";
-import { SubscribeSuccessPage } from "@/pages/subscribe-success";
 
 const APP_PREFIXES = ["/home", "/screener", "/alerts", "/profile"];
 
@@ -108,27 +105,6 @@ const onboardingExperienceRoute = createRoute({
   path: "/onboarding/experience",
   component: OnboardingExperiencePage,
 });
-const onboardingPlanRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/onboarding/plan",
-  beforeLoad: () => {
-    throw redirect({ to: "/subscribe" });
-  },
-  component: SubscribePage,
-});
-const subscribeRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/subscribe",
-  component: SubscribePage,
-});
-const subscribeSuccessRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/subscribe/success",
-  validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
-    session_id: typeof search.session_id === "string" ? search.session_id : undefined,
-  }),
-  component: SubscribeSuccessPage,
-});
 
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -158,9 +134,6 @@ const routeTree = rootRoute.addChildren([
   onboardingNameRoute,
   onboardingAssetRoute,
   onboardingExperienceRoute,
-  onboardingPlanRoute,
-  subscribeRoute,
-  subscribeSuccessRoute,
   homeRoute,
   screenerRoute,
   alertsRoute,

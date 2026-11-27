@@ -13,14 +13,13 @@ import {
   updatePassword,
   updateProfile,
 } from "./services/auth";
-import { confirmCheckout, createCheckoutSession, createPortalSession } from "./services/billing";
 import { analyzeTicker, chatWithMarket } from "./services/ai";
 import { createRule, listAlerts } from "./services/alerts";
 import { getMovers, getMarketSnapshot } from "./services/market";
 import { addWatchlistSymbol, getWatchlist, removeWatchlistSymbol } from "./services/watchlist";
 import { applyScreen, scoreMatch } from "./services/screener";
 import { consumeRateLimit } from "./lib/rate-limit";
-import type { AlertType, PlanId, Profile } from "./types";
+import type { AlertType, Profile } from "./types";
 
 const credentials = z.object({
   email: z.string().email(),
@@ -37,7 +36,6 @@ const profilePatch = z
         z.string().regex(/^data:image\/(jpeg|jpg|png|webp);base64,/i).max(400_000),
       ])
       .optional(),
-    plan: z.enum(["pro", "max"]).optional(),
     assetClass: z.array(z.enum(["stocks", "crypto", "futures", "options"])).min(1).max(4).optional(),
     experience: z.enum(["just_starting", "1_3_years", "3_7_years", "7_plus"]).optional(),
     currency: z.string().max(20).optional(),
@@ -73,7 +71,9 @@ const filterSchema = z.object({
   label: z.string().max(80),
 });
 
-const PLAN_LIMITS: Record<PlanId, number> = { pro: 25, max: 500 };
+/** Per-user limits for watchlist symbols and alert rules. */
+export const WATCHLIST_LIMIT = 50;
+export const ALERT_LIMIT = 50;
 
 function authError(error: unknown, fallback: string, status: 400 | 401 = 400) {
   if (error instanceof AuthError) {
@@ -122,39 +122,6 @@ export function createApp() {
     return c.json({ data: await getProfile(c.get("session")) });
   });
 
-  app.post("/billing/checkout", zValidator("json", z.object({ plan: z.enum(["pro", "max"]) })), async (c) => {
-    try {
-      const { plan } = c.req.valid("json");
-      return c.json({ data: await createCheckoutSession(c.get("session"), plan, c.req.header("origin")) });
-    } catch (error) {
-      const { message, status } = authError(error, "Unable to start checkout");
-      return c.json({ error: message }, status);
-    }
-  });
-
-  app.post("/billing/portal", async (c) => {
-    try {
-      return c.json({ data: await createPortalSession(c.get("session")) });
-    } catch (error) {
-      const { message, status } = authError(error, "Unable to open billing portal");
-      return c.json({ error: message }, status);
-    }
-  });
-
-  app.post(
-    "/billing/confirm",
-    zValidator("json", z.object({ sessionId: z.string().min(3), plan: z.enum(["pro", "max"]).optional() })),
-    async (c) => {
-      try {
-        const { sessionId, plan } = c.req.valid("json");
-        return c.json({ data: await confirmCheckout(c.get("session"), sessionId, plan) });
-      } catch (error) {
-        const { message, status } = authError(error, "Unable to confirm subscription");
-        return c.json({ error: message }, status);
-      }
-    },
-  );
-
   app.post(
     "/auth/password",
     zValidator("json", z.object({ password: z.string().min(8).max(72) })),
@@ -201,9 +168,7 @@ export function createApp() {
     async (c) => {
       try {
         const session = c.get("session");
-        const profile = await getProfile(session);
-        const cap = PLAN_LIMITS[profile.plan];
-        return c.json({ data: await addWatchlistSymbol(session, c.req.valid("json").symbol, cap) });
+        return c.json({ data: await addWatchlistSymbol(session, c.req.valid("json").symbol, WATCHLIST_LIMIT) });
       } catch (error) {
         const { message, status } = authError(error, "Unable to save watchlist");
         return c.json({ error: message }, status);
@@ -259,11 +224,8 @@ export function createApp() {
     ),
     async (c) => {
       const session = c.get("session");
-      const profile = await getProfile(session);
-      const current = listAlerts(session.sub).length;
-      const cap = PLAN_LIMITS[profile.plan];
-      if (current >= cap) {
-        return c.json({ error: "Plan ticker limit reached. Upgrade to Max for unlimited alerts." }, 403);
+      if (listAlerts(session.sub).length >= ALERT_LIMIT) {
+        return c.json({ error: `Alert limit reached (${ALERT_LIMIT}).` }, 403);
       }
       const body = c.req.valid("json");
       return c.json({ data: await createRule(session, { ...body, type: body.type as AlertType }) }, 201);

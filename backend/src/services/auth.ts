@@ -63,17 +63,13 @@ function blankProfile(id: string, email: string): Profile {
     email,
     firstName: "",
     avatarUrl: null,
-    plan: "pro",
     assetClass: ["stocks"],
     experience: "just_starting",
     currency: "USD ($)",
     timezone: "Eastern Time (UTC-5)",
     twoFactorEnabled: false,
     linkedBrokers: 0,
-    renewsAt: "Sep 20, 2026",
-    cardLast4: "4417",
     onboardingComplete: false,
-    subscriptionStatus: "inactive",
   };
 }
 
@@ -87,9 +83,7 @@ users.set(DEMO_EMAIL, {
   profile: {
     ...blankProfile(DEMO_USER_ID, DEMO_EMAIL),
     firstName: "Demo",
-    plan: "max",
     onboardingComplete: true,
-    subscriptionStatus: "active",
     twoFactorEnabled: true,
     linkedBrokers: 2,
   },

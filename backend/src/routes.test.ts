@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createApp } from "./app";
+import { ALERT_LIMIT, WATCHLIST_LIMIT, createApp } from "./app";
 import { UNIVERSE_SYMBOLS } from "./data/universe";
 
 const app = createApp();
@@ -55,7 +55,8 @@ describe("auth routes", () => {
   it("logs in as the built-in demo user", async () => {
     const res = await call("/auth/login", { body: { email: "demo@tickerly.app", password: "tickerly123" } });
     expect(res.status).toBe(200);
-    expect(res.json.data).toMatchObject({ firstName: "Demo", plan: "max", subscriptionStatus: "active" });
+    expect(res.json.data).toMatchObject({ firstName: "Demo", onboardingComplete: true });
+    expect(res.json.data).not.toHaveProperty("plan");
   });
 
   it("changes the password", async () => {
@@ -92,10 +93,15 @@ describe("profile routes", () => {
     expect((await call("/auth/me", { cookie })).json.data.firstName).toBe("Sam");
   });
 
-  it("rejects unknown profile fields", async () => {
+  it("rejects unknown profile fields, including the removed plan field", async () => {
     const { cookie } = await newUser();
-    const res = await call("/profile", { method: "PATCH", body: { isAdmin: true }, cookie });
-    expect(res.status).toBe(400);
+    expect((await call("/profile", { method: "PATCH", body: { isAdmin: true }, cookie })).status).toBe(400);
+    expect((await call("/profile", { method: "PATCH", body: { plan: "max" }, cookie })).status).toBe(400);
+  });
+
+  it("no longer exposes billing endpoints", async () => {
+    expect((await call("/billing/checkout", { body: { plan: "pro" } })).status).toBe(404);
+    expect((await call("/billing/portal", { method: "POST" })).status).toBe(404);
   });
 
   it("saves notification preferences", async () => {
@@ -105,30 +111,6 @@ describe("profile routes", () => {
     const prefs = { priceTargets: false, volumeSpikes: true, earnings: false, weeklyDigest: true };
     expect((await call("/profile/notifications", { method: "PUT", body: prefs, cookie })).status).toBe(200);
     expect((await call("/profile/notifications", { cookie })).json.data).toEqual(prefs);
-  });
-});
-
-describe("billing routes", () => {
-  it("activates a plan locally through checkout and confirm", async () => {
-    const { cookie } = await newUser();
-    expect((await call("/auth/me", { cookie })).json.data.subscriptionStatus).toBe("inactive");
-
-    const checkout = await call("/billing/checkout", { body: { plan: "max" }, cookie });
-    expect(checkout.json.data.url).toMatch(/\/subscribe\/success\?session_id=local$/);
-
-    const confirm = await call("/billing/confirm", { body: { sessionId: "local", plan: "max" }, cookie });
-    expect(confirm.json.data).toMatchObject({ plan: "max", subscriptionStatus: "active", onboardingComplete: true });
-  });
-
-  it("returns a portal url", async () => {
-    const { cookie } = await newUser();
-    const res = await call("/billing/portal", { method: "POST", cookie });
-    expect(res.json.data.url).toMatch(/\/subscribe$/);
-  });
-
-  it("rejects unknown plans", async () => {
-    const { cookie } = await newUser();
-    expect((await call("/billing/checkout", { body: { plan: "enterprise" }, cookie })).status).toBe(400);
   });
 });
 
@@ -182,13 +164,14 @@ describe("market routes", () => {
     expect(res.json.error).toBe("Enter a ticker symbol");
   });
 
-  it("enforces the Pro plan watchlist cap of 25", async () => {
+  it(`enforces the watchlist limit of ${WATCHLIST_LIMIT}`, async () => {
     const { cookie } = await newUser();
-    for (const symbol of UNIVERSE_SYMBOLS.slice(0, 25)) {
+    for (const symbol of UNIVERSE_SYMBOLS.slice(0, WATCHLIST_LIMIT)) {
       expect((await call("/market/watchlist", { body: { symbol }, cookie })).status).toBe(200);
     }
-    const over = await call("/market/watchlist", { body: { symbol: UNIVERSE_SYMBOLS[25] }, cookie });
+    const over = await call("/market/watchlist", { body: { symbol: UNIVERSE_SYMBOLS[WATCHLIST_LIMIT] }, cookie });
     expect(over.status).toBe(403);
+    expect(over.json.error).toBe("Watchlist limit reached.");
   });
 
   it("screens quotes and sorts matches by score", async () => {
@@ -239,13 +222,14 @@ describe("alert routes", () => {
     expect((await call("/alerts", { cookie: b.cookie })).json.data).toHaveLength(0);
   });
 
-  it("enforces the Pro plan alert cap of 25", async () => {
+  it(`enforces the alert limit of ${ALERT_LIMIT}`, async () => {
     const { cookie } = await newUser();
-    for (let i = 0; i < 25; i += 1) {
+    for (let i = 0; i < ALERT_LIMIT; i += 1) {
       expect((await call("/alerts", { body: { symbol: "PEAR", type: "VOLATILITY" }, cookie })).status).toBe(201);
     }
     const over = await call("/alerts", { body: { symbol: "PEAR", type: "VOLATILITY" }, cookie });
     expect(over.status).toBe(403);
+    expect(over.json.error).toBe(`Alert limit reached (${ALERT_LIMIT}).`);
   });
 
   it("rejects invalid alert types and non-positive targets", async () => {
